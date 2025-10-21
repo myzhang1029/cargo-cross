@@ -10,10 +10,73 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_TARGET: mips-unknown-linux-musl
 
 jobs:
   build:
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - image_target: aarch64-linux-android
+        - image_target: aarch64-unknown-freebsd
+        - image_target: aarch64-unknown-linux-gnu
+        - image_target: aarch64-unknown-linux-gnu
+        - image_target: aarch64-unknown-linux-musl
+        - image_target: arm-linux-androideabi
+        - image_target: arm-unknown-linux-gnueabi
+        - image_target: arm-unknown-linux-gnueabihf
+        - image_target: arm-unknown-linux-musleabi
+        - image_target: arm-unknown-linux-musleabihf
+        - image_target: armv5te-unknown-linux-gnueabi
+        - image_target: armv5te-unknown-linux-musleabi
+        - image_target: armv7-linux-androideabi
+        - image_target: armv7-unknown-linux-gnueabi
+        - image_target: armv7-unknown-linux-gnueabihf
+        - image_target: armv7-unknown-linux-musleabi
+        - image_target: armv7-unknown-linux-musleabihf
+        - image_target: asmjs-unknown-emscripten
+        - image_target: i586-unknown-linux-gnu
+        - image_target: i586-unknown-linux-musl
+        - image_target: i686-linux-android
+        - image_target: i686-pc-windows-gnu
+        - image_target: i686-unknown-freebsd
+        - image_target: i686-unknown-linux-gnu
+        - image_target: i686-unknown-linux-musl
+        - image_target: loongarch64-unknown-linux-gnu
+        - image_target: loongarch64-unknown-linux-musl
+        - image_target: mips-unknown-linux-gnu
+        - image_target: mips-unknown-linux-musl
+        - image_target: mips64-unknown-linux-gnuabi64
+        - image_target: mips64-unknown-linux-muslabi64
+        - image_target: mips64el-unknown-linux-gnuabi64
+        - image_target: mips64el-unknown-linux-muslabi64
+        - image_target: mipsel-unknown-linux-gnu
+        - image_target: mipsel-unknown-linux-musl
+        - image_target: powerpc-unknown-linux-gnu
+        - image_target: powerpc64-unknown-linux-gnu
+        - image_target: powerpc64le-unknown-linux-gnu
+        - image_target: riscv64gc-unknown-linux-gnu
+        - image_target: riscv64gc-unknown-linux-musl
+        - image_target: s390x-unknown-linux-gnu
+        - image_target: sparc64-unknown-linux-gnu
+        - image_target: sparcv9-sun-solaris
+        - image_target: thumbv6m-none-eabi
+        - image_target: thumbv7em-none-eabi
+        - image_target: thumbv7em-none-eabihf
+        - image_target: thumbv7m-none-eabi
+        - image_target: thumbv7neon-linux-androideabi
+        - image_target: thumbv7neon-unknown-linux-gnueabihf
+        - image_target: wasm32-unknown-emscripten
+        - image_target: x86_64-linux-android
+        - image_target: x86_64-pc-solaris
+        - image_target: x86_64-pc-windows-gnu
+        - image_target: x86_64-unknown-dragonfly
+        - image_target: x86_64-unknown-freebsd
+        - image_target: x86_64-unknown-illumos
+        - image_target: x86_64-unknown-linux-gnu
+        - image_target: x86_64-unknown-linux-gnu
+        - image_target: x86_64-unknown-linux-musl
+        - image_target: x86_64-unknown-netbsd
 
     runs-on: ubuntu-22.04-arm
     permissions:
@@ -46,14 +109,14 @@ jobs:
         id: meta
         uses: docker/metadata-action@96383f45573cb7f253c731d3b3ab81c87ef81934 # v5.0.0
         with:
-          images: ${{ env.REGISTRY }}/myzhang1029/linux-aarch64-cargo-cross-${{ env.IMAGE_TARGET }}
+          images: ${{ env.REGISTRY }}/myzhang1029/linux-aarch64-cargo-cross-${{ matrix.config.image_target }}
 
       - name: Build and push Docker image
         id: build-and-push
         uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
         with:
           context: docker
-          file: docker/Dockerfile.${{ env.IMAGE_TARGET }}
+          file: docker/Dockerfile.${{ matrix.config.image_target }}
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
